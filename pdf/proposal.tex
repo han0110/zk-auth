@@ -1,0 +1,86 @@
+\documentclass[sigconf]{acmart}
+
+\settopmatter{printacmref=false}
+\setcopyright{none}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\title{CNS Term Project Proposal}
+\subtitle{A Deep Dive Into Anonymous Authentication System With Zero-Knowledge Proof}
+\author{
+    R08922161 \and
+    M10915072 \and
+    B08902124 \and
+    B05901044
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Motivation}
+Since more and more people have got COVID-19 vaccine, the idea of vaccine
+certificate system is mentioned in many place, which is said to help people
+travel across country border easier. Although building such a large system
+seems to be hard, we might expect the idea would be adopted in smaller scale
+such as getting into workspace or theater without lining up taking temperature
+in the near future. \\
+However, in such use case, there is a main drawback that when we are proving
+our ownership of a vaccine certificate, we might leak our personal information
+to the verifier or the system, which is undesired invasion of privacy. So we
+are wondering how to achieve a system able to authenticate that an user is in
+a membership set without revealing his identity, which is also known as
+\textbf{Anonymous Authentication System}. Then we found Zero-Knowledge Proof
+might be the most important block to build such a system, which allows us prove
+the possess of knowledge without revealing it. \\
+Fortunately, ZKP is getting pratical for general programing since \cite{GGPR13}
+and developer freindly with many tools showing up. So it might be worthwhile to
+not only do the research of such system but also try to implement one with
+modern tools.
+
+\section{Plan}
+To have a better understanding of current state of research about anonymous
+authentication system, we will first do a comprehensive research on it to
+check what's the possible solution to build such a system and what's the main
+challenges we are facing. \\
+In the meantime, we are going to understand how the state-of-art ZKP system
+\cite{Gro16} works and try to build programmable ZKP above it with
+\href{https://github.com/iden3/circom}{Circom}, which is a programming language
+that allows us to build general program in ZKP easily. \\
+Finally, we expect to implement an anonymous authentication system with ZKP
+and then build a vaccine certificate system above it to show how it might help
+in real world situation.
+
+\section{Timeline}
+We are going to have a checkpoint per week, and here is our goal to check in
+each checkpoint:
+\begin{enumerate}
+    \item \textbf{05/11} - Having understanding about current solutions and
+    problems about anonymous authenticate system.
+    \item \textbf{05/18} - Having understanding about how \cite{Gro16} works and
+    able to build general program in
+    \href{https://github.com/iden3/circom}{Circom}.
+    \item \textbf{05/25} - Finish the specification of the anonymous
+    authenticate system and vaccine certificate system we are going to build.
+    \item \textbf{06/01} - Finish anonymous authenticate system.
+    \item \textbf{06/08} - Finish vaccine certificate system and TUI client to
+    interact with it.
+\end{enumerate}
+
+\section{Deliverables}
+In the end of this term project, we expect to deliver:
+\begin{itemize}
+    \item A research report about anonymous authentication system
+    \item A proof-of-concept anonymous authentication system built with ZK-SNARK
+\end{itemize}
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
