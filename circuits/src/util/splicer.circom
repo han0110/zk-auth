@@ -15,7 +15,7 @@ template Splicer(INPUT_LEN) {
     component eq[OUTPUT_LEN];
     for (var i = 0; i < OUTPUT_LEN; i++) {
         mux2[i] = Mux2();
-        lt[i] = LessThan(log2_ceil(INPUT_LEN + 1));
+        lt[i] = LessThan(log2Ceil(INPUT_LEN + 1));
         eq[i] = IsEqual();
         lt[i].in[0] <== i;
         lt[i].in[1] <== index;
@@ -23,7 +23,7 @@ template Splicer(INPUT_LEN) {
         eq[i].in[1] <== index;
 
         // s will be one of
-        // - [0, 0] -> i > index -> select c[0] (in[i-1])
+        // - [0, 0] -> i > index -> select c[0] (in[i - 1])
         // - [1, 0] -> i < index -> select c[1] (in[i])
         // - [0, 1] -> i = index -> select c[2] (item)
         mux2[i].s[0] <== lt[i].out;

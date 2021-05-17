@@ -13,6 +13,6 @@ function log2(n) {
     return ret;
 }
 
-function log2_ceil(n) {
+function log2Ceil(n) {
     return log2(n) + (n & (n - 1) ? 1 : 0);
 }
