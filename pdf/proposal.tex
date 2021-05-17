@@ -64,22 +64,22 @@ in real world situations, particularly with regard to mitigating the current pan
 We are going to have a checkpoint per week, and here is our goal to check in
 each checkpoint:
 \begin{enumerate}
-    \item \textbf{05/11} - Having understanding about current solutions and
-    problems about anonymous authenticate system.
-    \item \textbf{05/18} - Having understanding about how \cite{Gro16} works and
-    able to build general program in
-    \href{https://github.com/iden3/circom}{Circom}.
-    \item \textbf{05/25} - Finish the specification of the anonymous
-    authentication system and vaccine certificate system we are going to build.
-    \item \textbf{06/01} - Finish anonymous authentication system.
-    \item \textbf{06/08} - Finish vaccine certificate system and quarantine assurance system and TUI client to interact with it.
+	\item \textbf{05/11} - Having understanding about current solutions and
+	      problems about anonymous authenticate system.
+	\item \textbf{05/18} - Having understanding about how \cite{Gro16} works and
+	      able to build general program in
+	      \href{https://github.com/iden3/circom}{Circom}.
+	\item \textbf{05/25} - Finish the specification of the anonymous
+	      authentication system and vaccine certificate system we are going to build.
+	\item \textbf{06/01} - Finish anonymous authentication system.
+	\item \textbf{06/08} - Finish vaccine certificate system and quarantine assurance system and TUI client to interact with it.
 \end{enumerate}
 
 \section{Deliverables}
 In the end of this term project, we expect to deliver:
 \begin{itemize}
-    \item A research report about anonymous authentication system implementations
-    \item A proof-of-concept anonymous authentication system built with ZK-SNARK
+	\item A research report about anonymous authentication system implementations
+	\item A proof-of-concept anonymous authentication system built with ZK-SNARK
 \end{itemize}
 
 Our proof-of-concept system would attempt to simulate how such an anonymous authentication system would be applied on a larger scale. As such, central authorities such as governments or hospitals, as well as end users, would all be simulated in our proof-of-concept system.
@@ -89,28 +89,28 @@ Our anonymous authentication system assumes a central authority could update a d
 In the case of vaccine authentication, after a given user has been vaccinated, they could download a COVID-19 Vaccine Passport app and then register with the central authority. Alternatively, this could be done on behalf of the user by the hospital administering the vaccine. In the case of quarantine verification, this could be handled by the central authority (i.e., a government) directly.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=6cm]{image/registration.png}
-    \caption{Registration}
-    \label{fig:reg}
+	\centering
+	\includegraphics[width=6cm]{image/registration.png}
+	\caption{Registration}
+	\label{fig:reg}
 \end{figure}
 
 When a user would go someplace such as a store or movie theater, the place may wish to receive proof that the user has been vaccinated or is not supposed to be in quarantine. As such the user could provide a proof that does not reveal the user's identity.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=6cm]{image/authentication.png}
-    \caption{Authentication}
-    \label{fig:auth}
+	\centering
+	\includegraphics[width=6cm]{image/authentication.png}
+	\caption{Authentication}
+	\label{fig:auth}
 \end{figure}
 
 We assume the lifetime of a merkle tree would be for a selected amount of time, after which the tree would update from the set controlled by the central authority, and every user would automatically fetch the latest merkle root hash and merkle proof, and all validators would fetch the latest merkle root hash at consistent time intervals. As such, new user IDs could be added to the merkle tree upon vaccination, or upon being placed in quarantine. In the case of quarantine, user IDs could expire from the set after a set amount of time, representing the duration of the quarantine.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=6cm]{image/revocation.png}
-    \caption{Revocation}
-    \label{fig:rev}
+	\centering
+	\includegraphics[width=6cm]{image/revocation.png}
+	\caption{Revocation}
+	\label{fig:rev}
 \end{figure}
 
 We also plan on assessing possible ways that end users could potentially abuse our system, in an effort to improve robustness, efficiency, and privacy of the system.
