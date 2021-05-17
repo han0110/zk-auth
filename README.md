@@ -1,1 +1,1 @@
-# ZK Anonymous Auth
+# ZK Auth
