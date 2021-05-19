@@ -3,8 +3,7 @@ import { expect } from 'chai'
 import { tester } from 'circom'
 
 export type Circuit = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  calculateWitness: (input: object, checkLC: boolean) => Promise<BigInt[]>
+  calculateWitness: (input: object, checkLC?: boolean) => Promise<BigInt[]>
   getWitnessSymbol: (witness: BigInt[], symbol: string) => BigInt[]
   expectWitnessEqual: (
     witness: BigInt[],
@@ -18,7 +17,6 @@ export const prepareCircuit = async (path: string): Promise<Circuit> => {
   const circuit = await tester(join(__dirname, 'circuit', path))
   await Promise.all([circuit.loadSymbols(), circuit.loadConstraints()])
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   circuit.calculateWitness = async (input: object, checkLC = true) => {
     const witness = await circuit.witnessCalculator.calculateWitness(
       input,

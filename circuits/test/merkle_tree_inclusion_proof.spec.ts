@@ -1,53 +1,55 @@
-import { poseidon } from 'circomlib'
 import { Circuit, prepareCircuit } from './helper'
+import { MerkleTree, MemStorage, PoseidonHasher } from '@zk-auth/merkle-tree'
 
-describe('merkle_tree_inclusion_proof_2_2', function () {
-  this.timeout(10000)
+describe('merkle_tree_inclusion_proof', function () {
+  this.timeout(30000)
 
-  let circuit: Circuit
+  const circuits: Record<string, Circuit> = {}
 
-  before(async () => {
-    circuit = await prepareCircuit('merkle_tree_inclusion_proof_2_2.circom')
+  after(() =>
+    Promise.all(Object.values(circuits).map((circuit) => circuit.release())),
+  )
+
+  const fuzzyTest = async (
+    { width, depth }: { width: number; depth: number },
+    round: number,
+  ): Promise<void> => {
+    const circuitPath = `merkle_tree_inclusion_proof_${width}_${depth}.circom`
+    if (!circuits[circuitPath]) {
+      circuits[circuitPath] = await prepareCircuit(circuitPath)
+    }
+    const circuit = circuits[circuitPath]
+    const hasher = new PoseidonHasher()
+
+    for (let i = 0; i < round; i++) {
+      const merkleTree = new MerkleTree(new MemStorage(), hasher, width, depth)
+      const elements = [...Array(Math.floor(100 * Math.random()))].map(() =>
+        hasher.hash([BigInt(Math.floor((1 << 32) * Math.random()))]),
+      )
+      const index = Math.floor(elements.length * Math.random())
+      await elements.reduce(
+        (p, element) => p.then(() => merkleTree.insert(element)),
+        <any>Promise.resolve(),
+      )
+
+      const merkleProof = await merkleTree.merkleProof(index)
+      const witness = await circuit.calculateWitness(
+        {
+          element: elements[index],
+          branch_index: merkleProof.path.map(({ branchIndex }) => branchIndex),
+          siblings: merkleProof.path.map(({ siblings }) => siblings),
+        },
+        true,
+      )
+      circuit.expectWitnessEqual(witness, 'root', await merkleTree.root())
+    }
+  }
+
+  it('should pass fuzzy test of width 2 depth 32', async () => {
+    await fuzzyTest({ width: 2, depth: 32 }, 10)
   })
 
-  after(() => circuit.release())
-
-  // TODO: implement ts merkle tree structure to help test
-  it('should pass all testcases', async () => {
-    const testcases = [
-      {
-        leaf: poseidon([0]),
-        leaf_indexes: [0, 0],
-        leaf_neighbors: [
-          [poseidon([0])],
-          [poseidon([poseidon([0]), poseidon([0])])],
-        ],
-        root: poseidon([
-          poseidon([poseidon([0]), poseidon([0])]),
-          poseidon([poseidon([0]), poseidon([0])]),
-        ]),
-      },
-      {
-        leaf: poseidon([3]),
-        leaf_indexes: [0, 1],
-        leaf_neighbors: [
-          [poseidon([4])],
-          [poseidon([poseidon([1]), poseidon([2])])],
-        ],
-        root: poseidon([
-          poseidon([poseidon([1]), poseidon([2])]),
-          poseidon([poseidon([3]), poseidon([4])]),
-        ]),
-      },
-    ]
-
-    await testcases.reduce(
-      (p, { root, ...testcase }) =>
-        p.then(async () => {
-          const witness = await circuit.calculateWitness(testcase, true)
-          circuit.expectWitnessEqual(witness, 'root', root)
-        }),
-      Promise.resolve(),
-    )
+  it('should pass fuzzy test of width 3 depth 20', async () => {
+    await fuzzyTest({ width: 3, depth: 20 }, 10)
   })
 })
