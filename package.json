@@ -1,9 +1,12 @@
 {
   "name": "zk-auth",
   "workspaces": [
-    "circuits"
+    "circuits",
+    "packages/*"
   ],
   "scripts": {
+    "build": "yarn workspaces foreach run build",
+    "test": "yarn workspaces foreach run test",
     "lint": "eslint --ignore-path .gitignore '{circuits,packages}/**/*.ts'",
     "prettier": "prettier --check '{circuits,packages}/**/*.ts' --ignore-path .gitignore"
   },
