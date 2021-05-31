@@ -1,15 +1,18 @@
 {
-  "name": "@zk-auth/circuits",
+  "name": "@zk-auth/identity",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js"
+  },
   "scripts": {
+    "build": "tsc -b",
     "test": "ts-mocha test/**/*.spec.ts"
   },
   "dependencies": {
-    "circom": "^0.5.45",
     "circomlib": "^0.5.2"
   },
   "devDependencies": {
-    "@zk-auth/identity": "workspace:*",
-    "@zk-auth/merkle-tree": "workspace:*",
+    "chai": "^4.3.4",
     "mocha": "^8.4.0",
     "ts-mocha": "^8.0.0",
     "typescript": "^4.2.4"

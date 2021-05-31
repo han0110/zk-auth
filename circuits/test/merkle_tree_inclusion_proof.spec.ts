@@ -2,7 +2,7 @@ import { Circuit, prepareCircuit } from './helper'
 import { MerkleTree, MemStorage, PoseidonHasher } from '@zk-auth/merkle-tree'
 
 describe('merkle_tree_inclusion_proof', function () {
-  this.timeout(30000)
+  this.timeout(60000)
 
   const circuits: Record<string, Circuit> = {}
 
@@ -23,8 +23,8 @@ describe('merkle_tree_inclusion_proof', function () {
 
     for (let i = 0; i < round; i++) {
       const merkleTree = new MerkleTree(new MemStorage(), hasher, width, depth)
-      const elements = [...Array(Math.floor(100 * Math.random()))].map(() =>
-        hasher.hash([BigInt(Math.floor((1 << 32) * Math.random()))]),
+      const elements = [...Array(Math.floor(100 * Math.random()) + 1)].map(() =>
+        hasher.hash([BigInt(Math.floor((1 << 30) * Math.random()))]),
       )
       const index = Math.floor(elements.length * Math.random())
       await elements.reduce(
@@ -33,15 +33,27 @@ describe('merkle_tree_inclusion_proof', function () {
       )
 
       const merkleProof = await merkleTree.merkleProof(index)
-      const witness = await circuit.calculateWitness(
-        {
+      try {
+        const witness = await circuit.calculateWitness(
+          {
+            element: elements[index],
+            branch_index: merkleProof.path.map(
+              ({ branchIndex }) => branchIndex,
+            ),
+            siblings: merkleProof.path.map(({ siblings }) => siblings),
+          },
+          true,
+        )
+        circuit.expectWitnessEqual(witness, 'root', await merkleTree.root())
+      } catch (error) {
+        console.log('index', index)
+        console.log({
           element: elements[index],
           branch_index: merkleProof.path.map(({ branchIndex }) => branchIndex),
           siblings: merkleProof.path.map(({ siblings }) => siblings),
-        },
-        true,
-      )
-      circuit.expectWitnessEqual(witness, 'root', await merkleTree.root())
+        })
+        throw error
+      }
     }
   }
 

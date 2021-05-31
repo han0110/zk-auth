@@ -4,10 +4,13 @@ import { tester } from 'circom'
 
 export type Circuit = {
   calculateWitness: (input: object, checkLC?: boolean) => Promise<BigInt[]>
-  getWitnessSymbol: (witness: BigInt[], symbol: string) => BigInt[]
+  filterWitnessBySymbol: (
+    witness: BigInt[],
+    symbol: string | RegExp,
+  ) => BigInt[]
   expectWitnessEqual: (
     witness: BigInt[],
-    symbol: string,
+    symbol: string | RegExp,
     expected: number | string | BigInt | Array<number | string | BigInt>,
   ) => void
   release: () => Promise<void>
@@ -26,20 +29,27 @@ export const prepareCircuit = async (path: string): Promise<Circuit> => {
     return witness
   }
 
-  circuit.getWitnessSymbol = (witness: BigInt[], symbol: string): BigInt[] => {
+  circuit.filterWitnessBySymbol = (
+    witness: BigInt[],
+    symbol: string | RegExp,
+  ): BigInt[] => {
+    if (typeof symbol === 'string') {
+      symbol = RegExp(`^main.${symbol}$`)
+    }
     return Object.keys(circuit.symbols)
-      .filter((s) => s.startsWith(`main.${symbol}`))
+      .filter((s) => s.match(symbol) !== null)
       .map((s) => witness[circuit.symbols[s].varIdx])
   }
 
   circuit.expectWitnessEqual = (
     witness: BigInt[],
-    symbol: string,
+    symbol: string | RegExp,
     expected: Array<number | string | BigInt>,
   ) => {
     expect(
-      (Array.isArray(expected) ? expected : [expected]).map(BigInt),
-    ).to.deep.eq(circuit.getWitnessSymbol(witness, symbol))
+      circuit.filterWitnessBySymbol(witness, symbol),
+      symbol.toString(),
+    ).to.deep.eq((Array.isArray(expected) ? expected : [expected]).map(BigInt))
   }
 
   return circuit

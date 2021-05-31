@@ -47,7 +47,7 @@ describe('splicer_3', function () {
       (p, { out, ...testcase }) =>
         p.then(async () => {
           const witness = await circuit.calculateWitness(testcase, true)
-          circuit.expectWitnessEqual(witness, 'out', out)
+          circuit.expectWitnessEqual(witness, /^main.out\[\d\]/, out)
         }),
       Promise.resolve(),
     )
