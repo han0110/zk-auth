@@ -573,6 +573,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@zk-auth/client@workspace:packages/client":
+  version: 0.0.0-use.local
+  resolution: "@zk-auth/client@workspace:packages/client"
+  dependencies:
+    "@types/node": ^15.6.1
+    chai: ^4.3.4
+    mocha: ^8.4.0
+    ts-mocha: ^8.0.0
+    ts-node: ^10.0.0
+    typescript: ^4.2.4
+  languageName: unknown
+  linkType: soft
+
 "@zk-auth/identity@workspace:*, @zk-auth/identity@workspace:packages/identity":
   version: 0.0.0-use.local
   resolution: "@zk-auth/identity@workspace:packages/identity"
