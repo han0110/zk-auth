@@ -1,0 +1,21 @@
+{
+  "name": "@zk-auth/circuits",
+  "scripts": {
+    "build": "ts-node ./script/build",
+    "test": "ts-mocha ./test/**/*.spec.ts",
+    "clean": "rm -r ./build"
+  },
+  "dependencies": {
+    "circom": "^0.5.45",
+    "circomlib": "^0.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^15.6.1",
+    "@zk-auth/identity": "workspace:*",
+    "@zk-auth/merkle-tree": "workspace:*",
+    "mocha": "^8.4.0",
+    "ts-mocha": "^8.0.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.2.4"
+  }
+}

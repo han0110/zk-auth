@@ -1,0 +1,26 @@
+{
+  "name": "zk-auth",
+  "workspaces": [
+    "circuits",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach run build",
+    "test": "yarn workspaces foreach run test",
+    "lint": "eslint --ignore-path .gitignore '{circuits,packages}/**/*.ts'",
+    "prettier": "prettier --check '{circuits,packages}/**/*.ts' --ignore-path .gitignore"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.18",
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^8.2.2",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-chai-friendly": "^0.7.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.0"
+  }
+}
