@@ -1,3 +1,11 @@
 {
-  "extends": "../tsconfig.json"
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": ["../node_modules/@types", "./types"],
+    "paths": {
+      "*": ["*", "./types/*"]
+    }
+  },
+  "include": ["script/**/*"]
 }

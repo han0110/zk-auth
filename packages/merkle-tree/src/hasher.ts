@@ -1,11 +1,11 @@
 import { poseidon } from 'circomlib'
 
 export interface Hasher {
-  hash: (inputs: BigInt[]) => BigInt
+  hash: (inputs: bigint[]) => bigint
 }
 
 export class PoseidonHasher implements Hasher {
-  hash(inputs: BigInt[]): BigInt {
+  hash(inputs: bigint[]): bigint {
     return poseidon(inputs)
   }
 }

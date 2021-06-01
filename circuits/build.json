@@ -1,0 +1,10 @@
+{
+  "buildDir": "./build",
+  "circuits": [
+    {
+      "file": "./src/membership_auth.circom",
+      "main": "MembershipAuth",
+      "params": [2, 20]
+    }
+  ]
+}

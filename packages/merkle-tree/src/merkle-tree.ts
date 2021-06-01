@@ -18,12 +18,12 @@ export type MerklePath = {
 }[]
 
 export type MerkleProof = {
-  root: BigInt
+  root: bigint
   path: {
     depth: number
     index: number
     branchIndex: number
-    siblings: BigInt[]
+    siblings: bigint[]
   }[]
 }
 
@@ -31,17 +31,18 @@ export type MerkleTreeStorageKeyFn = {
   root: () => string
   size: () => string
   element: (depth: number, index: number) => string
+  index: (element: bigint) => string
 }
 
 export type MerkleTreeOption = {
-  zero?: BigInt
+  zero?: bigint
   storageKeyFn?: MerkleTreeStorageKeyFn
 }
 
 export class MerkleTree {
   private mutex: Mutex
-  private maxIndex: BigInt
-  private zeros: BigInt[]
+  private maxIndex: bigint
+  private zeros: bigint[]
   private storageKeyFn: MerkleTreeStorageKeyFn
 
   constructor(
@@ -51,10 +52,11 @@ export class MerkleTree {
     public depth: number,
     {
       zero = BigInt(0),
-      storageKeyFn = {
+      storageKeyFn: { root, size, element, index } = {
         root: () => 'root',
         size: () => 'size',
         element: (depth: number, index: number) => `element_${depth}_${index}`,
+        index: (element: bigint) => `index_${element}`,
       },
     }: MerkleTreeOption = {},
   ) {
@@ -65,10 +67,10 @@ export class MerkleTree {
     for (let i = depth - 1; i >= 0; i--) {
       this.zeros[i] = hasher.hash(Array(width).fill(this.zeros[i + 1]))
     }
-    this.storageKeyFn = storageKeyFn
+    this.storageKeyFn = { root, size, element, index }
   }
 
-  async root(): Promise<BigInt> {
+  async root(): Promise<bigint> {
     const root = await this.storage.readOrDefault(
       this.storageKeyFn.root(),
       this.zeros[0],
@@ -82,7 +84,7 @@ export class MerkleTree {
     )
   }
 
-  async insert(element: BigInt): Promise<MerkleProof> {
+  async insert(element: bigint): Promise<MerkleProof> {
     const release = await this.mutex.acquire()
 
     try {
@@ -105,7 +107,19 @@ export class MerkleTree {
     }
   }
 
-  async merkleProof(index: number): Promise<MerkleProof> {
+  async merkleProof(indexOrElement: number | bigint): Promise<MerkleProof> {
+    let index: number
+    if (typeof indexOrElement === 'bigint') {
+      const elementIndex = await this.storage.read(
+        this.storageKeyFn.index(indexOrElement),
+      )
+      if (!elementIndex === undefined) {
+        throw new Error(`element ${indexOrElement.toString()} not found`)
+      }
+      index = Number(elementIndex)
+    } else {
+      index = indexOrElement
+    }
     if (BigInt(index) > this.maxIndex) {
       throw new Error(`index should be less than ${this.maxIndex}`)
     }
@@ -140,7 +154,7 @@ export class MerkleTree {
     }
   }
 
-  private async update(index: number, element: BigInt): Promise<MerkleProof> {
+  private async update(index: number, element: bigint): Promise<MerkleProof> {
     const merkleProof = await this.merkleProof(index)
 
     const keyValues = [
@@ -148,6 +162,14 @@ export class MerkleTree {
         key: this.storageKeyFn.element(this.depth, index),
         value: element,
       },
+      ...(element === BigInt(0)
+        ? []
+        : [
+            {
+              key: this.storageKeyFn.index(element),
+              value: BigInt(index),
+            },
+          ]),
     ]
     for (let i = 0; i < merkleProof.path.length; i++) {
       const { depth, branchIndex, siblings } = merkleProof.path[i]

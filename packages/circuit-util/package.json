@@ -1,5 +1,5 @@
 {
-  "name": "@zk-auth/merkle-tree",
+  "name": "@zk-auth/circuit-util",
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js"
@@ -9,10 +9,13 @@
     "test": "ts-mocha ./test/**/*.spec.ts"
   },
   "dependencies": {
-    "async-mutex": "^0.3.1",
-    "circomlib": "^0.5.2"
+    "@zk-auth/identity": "workspace:*",
+    "@zk-auth/merkle-tree": "workspace:*",
+    "node-fetch": "^2.6.1",
+    "snarkjs": "^0.4.2"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.5.10",
     "chai": "^4.3.4",
     "mocha": "^8.4.0",
     "ts-mocha": "^8.0.0",
