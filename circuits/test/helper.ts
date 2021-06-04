@@ -2,16 +2,18 @@ import { join } from 'path'
 import { expect } from 'chai'
 import { tester } from 'circom'
 
+const toHex = (n: bigint) => `0x${n.toString(16)}`
+
 export type Circuit = {
-  calculateWitness: (input: object, checkLC?: boolean) => Promise<BigInt[]>
+  calculateWitness: (input: object, checkLC?: boolean) => Promise<bigint[]>
   filterWitnessBySymbol: (
-    witness: BigInt[],
+    witness: bigint[],
     symbol: string | RegExp,
-  ) => BigInt[]
+  ) => bigint[]
   expectWitnessEqual: (
-    witness: BigInt[],
+    witness: bigint[],
     symbol: string | RegExp,
-    expected: number | string | BigInt | Array<number | string | BigInt>,
+    expected: number | string | bigint | Array<number | string | bigint>,
   ) => void
   release: () => Promise<void>
 }
@@ -30,9 +32,9 @@ export const prepareCircuit = async (path: string): Promise<Circuit> => {
   }
 
   circuit.filterWitnessBySymbol = (
-    witness: BigInt[],
+    witness: bigint[],
     symbol: string | RegExp,
-  ): BigInt[] => {
+  ): bigint[] => {
     if (typeof symbol === 'string') {
       symbol = RegExp(`^main.${symbol}$`)
     }
@@ -42,14 +44,16 @@ export const prepareCircuit = async (path: string): Promise<Circuit> => {
   }
 
   circuit.expectWitnessEqual = (
-    witness: BigInt[],
+    witness: bigint[],
     symbol: string | RegExp,
-    expected: Array<number | string | BigInt>,
+    expected: number | string | bigint | Array<number | string | bigint>,
   ) => {
     expect(
-      circuit.filterWitnessBySymbol(witness, symbol),
+      (circuit as Circuit).filterWitnessBySymbol(witness, symbol).map(toHex),
       symbol.toString(),
-    ).to.deep.eq((Array.isArray(expected) ? expected : [expected]).map(BigInt))
+    ).to.deep.eq(
+      (Array.isArray(expected) ? expected : [expected]).map(BigInt).map(toHex),
+    )
   }
 
   return circuit
