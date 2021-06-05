@@ -35,23 +35,16 @@ template CalculateIdentityCommitment(IDENTITY_PK_SIZE_IN_BITS, NULLIFIER_TRAPDOO
     out <== identity_commitment.out[0];
 }
 
-template CalculateNullifier(NULLIFIER_TRAPDOOR_SIZE_IN_BITS, CHALLENGE_SIZE_IN_BITS, WIDTH, DEPTH) {
+template CalculateNullifier(NULLIFIER_TRAPDOOR_SIZE_IN_BITS, CHALLENGE_SIZE_IN_BITS) {
     signal input challenge;
     signal input identity_nullifier[NULLIFIER_TRAPDOOR_SIZE_IN_BITS];
-    signal input identity_branch_index[DEPTH];
 
     signal output nullifiers_hash;
 
+    var NULLIFIERS_HASHER_BITS = 512;
+
     component challenge_bits = Num2Bits(CHALLENGE_SIZE_IN_BITS);
     challenge_bits.in <== challenge;
-
-    var PATH_INDEX_SIZE_IN_BIT = log2Ceil(WIDTH)
-    var PATH_SIZE_IN_BITS = PATH_INDEX_SIZE_IN_BIT * DEPTH;
-    var NULLIFIERS_HASHER_BITS = NULLIFIER_TRAPDOOR_SIZE_IN_BITS + CHALLENGE_SIZE_IN_BITS + PATH_SIZE_IN_BITS;
-    if (NULLIFIERS_HASHER_BITS < 512) {
-        NULLIFIERS_HASHER_BITS = 512;
-    }
-    assert(NULLIFIERS_HASHER_BITS <= 512);
 
     component nullifiers_hasher = Sha256(NULLIFIERS_HASHER_BITS);
     for (var i = 0; i < NULLIFIER_TRAPDOOR_SIZE_IN_BITS; i++) {
@@ -62,16 +55,7 @@ template CalculateNullifier(NULLIFIER_TRAPDOOR_SIZE_IN_BITS, CHALLENGE_SIZE_IN_B
         nullifiers_hasher.in[NULLIFIER_TRAPDOOR_SIZE_IN_BITS + i] <== challenge_bits.out[i];
     }
 
-    component index_bits[DEPTH];
-    for (var i = 0; i < DEPTH; i++) {
-        index_bits[i] = Num2Bits(PATH_INDEX_SIZE_IN_BIT);
-        index_bits[i].in <== identity_branch_index[i]
-        for (var j = 0; j < PATH_INDEX_SIZE_IN_BIT; j++) {
-            nullifiers_hasher.in[NULLIFIER_TRAPDOOR_SIZE_IN_BITS + CHALLENGE_SIZE_IN_BITS + i * PATH_INDEX_SIZE_IN_BIT + j] <== index_bits[i].out[j];
-        }
-    }
-
-    for (var i = (NULLIFIER_TRAPDOOR_SIZE_IN_BITS + CHALLENGE_SIZE_IN_BITS + PATH_SIZE_IN_BITS); i < NULLIFIERS_HASHER_BITS; i++) {
+    for (var i = NULLIFIER_TRAPDOOR_SIZE_IN_BITS + CHALLENGE_SIZE_IN_BITS; i < NULLIFIERS_HASHER_BITS; i++) {
         nullifiers_hasher.in[i] <== 0;
     }
 
@@ -156,13 +140,10 @@ template MembershipAuth(WIDTH, DEPTH) {
     root <== tree.root;
 
     // calculate nullifiers
-    component nullifiers_hasher = CalculateNullifier(NULLIFIER_TRAPDOOR_SIZE_IN_BITS, CHALLENGE_SIZE_IN_BITS, WIDTH, DEPTH);
+    component nullifiers_hasher = CalculateNullifier(NULLIFIER_TRAPDOOR_SIZE_IN_BITS, CHALLENGE_SIZE_IN_BITS);
     nullifiers_hasher.challenge <== challenge;
     for (var i = 0; i < NULLIFIER_TRAPDOOR_SIZE_IN_BITS; i++) {
         nullifiers_hasher.identity_nullifier[i] <== identity_nullifier_bits.out[i];
-    }
-    for (var i = 0; i < DEPTH; i++) {
-        nullifiers_hasher.identity_branch_index[i] <== identity_branch_index[i];
     }
     nullifiers_hash <== nullifiers_hasher.nullifiers_hash;
 
