@@ -1,7 +1,7 @@
 import { groth16 } from 'snarkjs'
 import { Proof, PublicSignals } from './type'
 
-const verify = async (
+export const verify = async (
   verificationKey: groth16.VerificationKey,
   proof: Proof,
   publicSignals: PublicSignals,
@@ -16,5 +16,3 @@ const verify = async (
     },
   )
 }
-
-export default verify

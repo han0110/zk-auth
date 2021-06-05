@@ -51,15 +51,9 @@ describe('circuit-util', function () {
     // generate proof
     const { proof, publicSignals } = await prove(WASM_PATH, FINAL_ZKEY_PATH, {
       challenge,
-      identityPk: identity.keypair.pubKey,
-      identityNullifier: identity.nullifier,
-      identityTrapdoor: identity.trapdoor,
-      identityBranchIndex: merkleProof.path.map(({ branchIndex }) =>
-        BigInt(branchIndex),
-      ),
-      identitySiblings: merkleProof.path.map(({ siblings }) => siblings),
-      authSigR: signature.r8,
-      authSigS: signature.s,
+      identity,
+      merkleProof,
+      signature,
     })
 
     // verify proof
