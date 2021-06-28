@@ -97,33 +97,18 @@ export class MerkleTree {
     }
   }
 
-  async delete(index: number): Promise<void> {
+  async delete(indexOrElement: number | bigint): Promise<void> {
     const release = await this.mutex.acquire()
 
     try {
-      await this.update(index, BigInt(0))
+      await this.update(indexOrElement, BigInt(0))
     } finally {
       release()
     }
   }
 
   async merkleProof(indexOrElement: number | bigint): Promise<MerkleProof> {
-    let index: number
-    if (typeof indexOrElement === 'bigint') {
-      const elementIndex = await this.storage.read(
-        this.storageKeyFn.index(indexOrElement),
-      )
-      if (!elementIndex === undefined) {
-        throw new Error(`element ${indexOrElement.toString()} not found`)
-      }
-      index = Number(elementIndex)
-    } else {
-      index = indexOrElement
-    }
-    if (BigInt(index) > this.maxIndex) {
-      throw new Error(`index should be less than ${this.maxIndex}`)
-    }
-
+    const index = await this.getIndex(indexOrElement)
     const root = await this.root()
     const merklePath = this.merklePath(index)
     const pathSiblings = splitChunk(
@@ -154,7 +139,11 @@ export class MerkleTree {
     }
   }
 
-  private async update(index: number, element: bigint): Promise<MerkleProof> {
+  private async update(
+    indexOrElement: number | bigint,
+    element: bigint,
+  ): Promise<MerkleProof> {
+    const index = await this.getIndex(indexOrElement)
     const merkleProof = await this.merkleProof(index)
 
     const keyValues = [
@@ -192,6 +181,25 @@ export class MerkleTree {
 
     merkleProof.root = keyValues[keyValues.length - 1].value
     return merkleProof
+  }
+
+  private async getIndex(indexOrElement: number | bigint): Promise<number> {
+    let index: number
+    if (typeof indexOrElement === 'bigint') {
+      const elementIndex = await this.storage.read(
+        this.storageKeyFn.index(indexOrElement),
+      )
+      if (!elementIndex === undefined) {
+        throw new Error(`element ${indexOrElement.toString()} not found`)
+      }
+      index = Number(elementIndex)
+    } else {
+      index = indexOrElement
+    }
+    if (BigInt(index) > this.maxIndex) {
+      throw new Error(`index should be less than ${this.maxIndex}`)
+    }
+    return index
   }
 
   private merklePath(index: number): MerklePath {

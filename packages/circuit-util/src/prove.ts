@@ -1,7 +1,7 @@
 import { groth16 } from 'snarkjs'
 import { Witness, Proof, PublicSignals } from './type'
 
-const prove = async (
+export const prove = async (
   wasmPath: string,
   finalZkeyPath: string,
   witness: Witness,
@@ -12,13 +12,17 @@ const prove = async (
   } = await groth16.fullProve(
     {
       challenge: witness.challenge,
-      identity_pk: witness.identityPk,
-      identity_nullifier: witness.identityNullifier,
-      identity_trapdoor: witness.identityTrapdoor,
-      identity_branch_index: witness.identityBranchIndex,
-      identity_siblings: witness.identitySiblings,
-      auth_sig_r: witness.authSigR,
-      auth_sig_s: witness.authSigS,
+      identity_pk: witness.identity.keypair.pubKey,
+      identity_nullifier: witness.identity.nullifier,
+      identity_trapdoor: witness.identity.trapdoor,
+      identity_branch_index: witness.merkleProof.path.map(({ branchIndex }) =>
+        BigInt(branchIndex),
+      ),
+      identity_siblings: witness.merkleProof.path.map(
+        ({ siblings }) => siblings,
+      ),
+      auth_sig_r: witness.signature.r8,
+      auth_sig_s: witness.signature.s,
     },
     wasmPath,
     finalZkeyPath,
@@ -36,5 +40,3 @@ const prove = async (
     },
   }
 }
-
-export default prove

@@ -22,7 +22,10 @@ const downloadPowerOfTau = async (
   )
 }
 
-const setup = async (r1csPath: string, keyDir: string): Promise<void> => {
+export const setup = async (
+  r1csPath: string,
+  keyDir: string,
+): Promise<void> => {
   mkdirSync(keyDir, { recursive: true })
   const { nConstraints } = await r1cs.info(r1csPath)
   const sizeStr = Math.ceil(Math.log2(nConstraints)).toString().padStart(2, '0')
@@ -47,5 +50,3 @@ const setup = async (r1csPath: string, keyDir: string): Promise<void> => {
     JSON.stringify(utils.stringifyBigInts(vKey), null, 2),
   )
 }
-
-export default setup

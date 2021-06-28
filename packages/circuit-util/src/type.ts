@@ -1,12 +1,11 @@
+import { EdDSASignature, Identity } from '@zk-auth/identity'
+import { MerkleProof } from '@zk-auth/merkle-tree'
+
 export type Witness = {
   challenge: bigint
-  identityPk: bigint[]
-  identityNullifier: bigint
-  identityTrapdoor: bigint
-  identityBranchIndex: bigint[]
-  identitySiblings: bigint[][]
-  authSigR: bigint[]
-  authSigS: bigint
+  identity: Identity
+  signature: EdDSASignature
+  merkleProof: MerkleProof
 }
 
 export type Proof = {
